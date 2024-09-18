@@ -44,7 +44,7 @@ function App() {
             content: state.description,
           },
         ],
-        max_tokens: 128,
+        max_tokens: 512,
         model: '',
         data_sources: [
           {
