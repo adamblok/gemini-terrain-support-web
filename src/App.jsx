@@ -24,7 +24,7 @@ function App() {
     };
 
     try {
-      const endpoint = 'https://hackweek-case5.openai.azure.com/';
+      const endpoint = 'https://hackweek-case5.openai.azure.com';
       const azureSearchEndpoint = 'https://search-case5.search.windows.net';
       const azureSearchIndexName = 'search-case5-index-demo';
       const deployment = 'gpt-4o-mini';
@@ -37,15 +37,24 @@ function App() {
         endpoint
       });
       const events = await client.chat.completions.create({
-        stream: true,
+        stream: false,
         messages: [
+          {
+            role: 'system',
+            content: 'I am a support person in Volue Technology that helps people find answers to questions and problems they have with the Gemini Terrain - application for the construction industry in the Nordics and beyond. Gemini Terrain is used in all phases of construction projects, including planning, engineering, follow-up and documentation of work performed. The software is used for the design and construction of infrastructure such as roads and tunnels in challenging environments.'
+          },
+          {
+            role: 'user',
+            content: 'I am a user of Terrain or a potential customer'
+          },
           {
             role: 'user',
             content: state.description,
           },
         ],
+        temperature: 0,
+        top_p: 1,
         max_tokens: 1024,
-        model: '',
         data_sources: [
           {
             type: 'azure_search',
@@ -61,26 +70,10 @@ function App() {
         ],
       });
 
-      const reader = events.toReadableStream().getReader();
-      const decoder = new TextDecoder();
-      let response = '';
+      const response = events?.choices[0]?.message?.content || '';
 
-      while (true) {
-        const {done, value} = await reader.read();
-
-        if (done) {
-          break;
-        }
-
-        const json = decoder.decode(value, { stream: true });
-        const data = JSON.parse(json);
-
-        response += data?.choices[0]?.delta?.content || '';
-
-        console.log(data?.choices[0]?.delta?.content);
-      }
-
-      if (response.length > 0 && !response.includes('try another query or topic')) {
+      if (response.length > 0 && !response.includes('Please try another query or topic') &&
+          !response.includes('Vennligst prøv et annet spørsmål eller tema')) {
         newState.response = response.replaceAll(/\s*\[doc\d+]/gi, '');
       } else {
         newState.sent = true;
