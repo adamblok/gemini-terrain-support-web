@@ -26,7 +26,7 @@ function App() {
     try {
       const endpoint = 'https://hackweek-case5.openai.azure.com/';
       const azureSearchEndpoint = 'https://search-case5.search.windows.net';
-      const azureSearchIndexName = 'kaare-og-adam-filer2';
+      const azureSearchIndexName = 'search-case5-index-demo';
       const deployment = 'gpt-4o-mini';
       const apiVersion = '2024-05-01-preview';
       const client = new AzureOpenAI({
@@ -44,7 +44,7 @@ function App() {
             content: state.description,
           },
         ],
-        max_tokens: 512,
+        max_tokens: 1024,
         model: '',
         data_sources: [
           {
